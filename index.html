@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Helper Hub</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f3e5f5, #ede7f6, #ffffff);
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(90deg, #8e24aa, #c695e4);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 5px;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      opacity: 0.99;
+    }
+
+    /* MAIN LAYOUT */
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      width: 300px;
+      background: linear-gradient(135deg, #ffffff, #f3e5f5);
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(142,36,170,0.2);
+      color: #af37d7;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #8e24aa;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.95rem;
+    }
+
+    input {
+      background: #ffffff;
+      color: #6a1b9a;
+      border: 1px solid #e1bee7;
+    }
+
+    input::placeholder {
+      color: #9c27b0;
+      opacity: 0.8;
+    }
+
+    button {
+      background: linear-gradient(90deg, #8e24aa, #ba68c8);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 6px 14px rgba(142,36,170,0.35);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(142,36,170,0.45);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    /* Small delete button inside To-Do list */
+    ul li button {
+        width: 30px;
+        height: 25px;
+        padding: 0;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #8e24aa, #ba68c8);
+        color: white;
+        box-shadow: 0 4px 10px rgba(142,36,170,0.35);
+        }
+
+    ul li {
+        background: #ede7f6;
+        margin: 8px 0;
+        padding: 12px;
+        color: #9c27b0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;   /* important */
+        gap: 10px;
+        border-radius: 10px;
+        word-wrap: break-word;
+        white-space: normal;       /* allow text wrap */
+        }
+
+    ul li span {
+        flex: 1;
+    }
+
+    /* CGPA QUOTE */
+    .cgpa-quote {
+      margin-top: 16px;
+      font-weight: bold;
+      font-style: italic;
+      color: #8e24aa;
+      text-align: center;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 12px 10px;
+      font-size: 14px;
+      background: linear-gradient(135deg, #8e24aa, #c695e4);
+      color: white;
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    footer .footer-extra {
+      margin-top: 5px;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1>Student Helper Hub</h1>
+    <p>Learn smart • Stay focused • Achieve more</p>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="container">
+    <div class="cards">
+
+      <!-- CGPA CARD -->
+      <div class="card">
+        <h2>CGPA Calculator</h2>
+
+        <div id="marksContainer"></div>
+
+        <button onclick="addMarkInput()">Add Subject Mark</button>
+        <button onclick="calculateCGPA()">Calculate CGPA</button>
+
+        <p id="cgpaResult"></p>
+        <div id="cgpaQuote" class="cgpa-quote" style="display:none;"></div>
+      </div>
+
+      <!-- TIMER CARD -->
+      <div class="card">
+        <h2>Study Timer</h2>
+        <p id="timer" style="text-align:center;font-weight:bold;">00:00</p>
+        <button onclick="startTimer()">Start</button>
+        <button onclick="stopTimer()">Stop</button>
+        <button onclick="resetTimer()">Reset</button>
+      </div>
+
+      <!-- TODO CARD -->
+      <div class="card">
+        <h2>To-Do List</h2>
+        <input type="text" id="todoInput" placeholder="Enter task" />
+        <button onclick="addTodo()">Add Task</button>
+        <ul id="todoList"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Student Helper Hub | Designed for students</p>
+    <div class="footer-extra">
+      <p>• CGPA Calculator • Study Timer • Task Manager</p>
+      <p>Built using HTML, CSS & JavaScript | Hosted on GitHub Pages</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    /* CGPA CALCULATOR */
+    let subjectCount = 0;
+    const maxSubjects = 20;
+
+    function addMarkInput() {
+      if (subjectCount >= maxSubjects) {
+        alert("Maximum 20 subjects allowed");
+        return;
+      }
+      subjectCount++;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.placeholder = "Subject " + subjectCount + " Marks";
+      input.className = "mark";
+      document.getElementById("marksContainer").appendChild(input);
+    }
+
+    function calculateCGPA() {
+      const marks = document.querySelectorAll(".mark");
+      let total = 0;
+      let count = 0;
+
+      marks.forEach(m => {
+        const val = parseFloat(m.value);
+        if (!isNaN(val)) {
+          total += val;
+          count++;
+        }
+      });
+
+      if (count === 0) return;
+
+      const average = total / count;
+      const cgpa = (average / 10).toFixed(2);
+
+      document.getElementById("cgpaResult").innerText =
+        `Average Marks: ${average.toFixed(2)} | CGPA: ${cgpa}`;
+
+      showMotivationQuote(parseFloat(cgpa));
+    }
+
+    function showMotivationQuote(cgpa) {
+      let quote = "";
+
+      if (cgpa >= 9.5) {
+        quote = "Outstanding! You are among the best — excellence suits you.";
+      } else if (cgpa >= 9.0) {
+        quote = "Amazing work! You are very close to perfection.";
+      } else if (cgpa >= 8.0) {
+        quote = "Very good! Consistency is taking you far.";
+      } else if (cgpa >= 7.0) {
+        quote = "Good progress! Keep pushing, you’re improving.";
+      } else if (cgpa >= 6.0) {
+        quote = "You’re on the right path — focus and grow stronger.";
+      } else if (cgpa >= 5.0) {
+        quote = "Don’t give up. Every step forward matters.";
+      } else if (cgpa >= 4.0) {
+        quote = "This is not the end. Learn, improve, rise again.";
+      } else {
+        quote = "Failure is a lesson. Come back stronger next time.";
+      }
+
+      const quoteBox = document.getElementById("cgpaQuote");
+      quoteBox.innerHTML = `"${quote}"`;
+      quoteBox.style.display = "block";
+    }
+
+    /* STUDY TIMER */
+    let seconds = 0;
+    let interval = null;
+
+    function startTimer() {
+      if (interval) return;
+      interval = setInterval(() => {
+        seconds++;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        document.getElementById("timer").innerText =
+          String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function resetTimer() {
+      stopTimer();
+      seconds = 0;
+      document.getElementById("timer").innerText = "00:00";
+    }
+
+    /* TODO LIST */
+    function addTodo() {
+      const input = document.getElementById("todoInput");
+      if (input.value === "") return;
+
+      const li = document.createElement("li");
+     li.innerHTML = `
+        <span>${input.value}</span>
+        <button onclick="this.parentElement.remove()">X</button>
+        `;
+      document.getElementById("todoList").appendChild(li);
+      input.value = "";
+    }
+
+    /* INIT */
+    addMarkInput();
+  </script>
+
+</body>
+</html>
