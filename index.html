@@ -162,6 +162,13 @@
       margin-top: 5px;
       font-size: 0.85rem;
     }
+
+    .completed {
+  text-decoration: line-through;
+  color: rgb(65, 1, 92);
+  background-color: #f0dffa;
+  transform: scale(0.98);
+}
   </style>
 </head>
 
@@ -199,11 +206,14 @@
         <button onclick="resetTimer()">Reset</button>
       </div>
 
-      <!-- TODO CARD -->
+     <!-- TODO CARD -->
       <div class="card">
         <h2>To-Do List</h2>
+
         <input type="text" id="todoInput" placeholder="Enter task" />
+        <input type="date" id="todoDate" />
         <button onclick="addTodo()">Add Task</button>
+
         <ul id="todoList"></ul>
       </div>
 
@@ -225,42 +235,55 @@
     let subjectCount = 0;
     const maxSubjects = 20;
 
-    function addMarkInput() {
-      if (subjectCount >= maxSubjects) {
-        alert("Maximum 20 subjects allowed");
-        return;
-      }
-      subjectCount++;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.placeholder = "Subject " + subjectCount + " Marks";
-      input.className = "mark";
-      document.getElementById("marksContainer").appendChild(input);
+  function addMarkInput() {
+    if (subjectCount >= maxSubjects) {
+      alert("Maximum 20 subjects allowed");
+      return;
     }
+
+    subjectCount++;
+
+    const container = document.createElement("div");
+
+    container.innerHTML = `
+      <input type="number" placeholder="Subject ${subjectCount} Marks" class="mark">
+      <input type="number" placeholder="Subject ${subjectCount} Credit" class="credit">
+    `;
+
+    document.getElementById("marksContainer").appendChild(container);
+  }
 
     function calculateCGPA() {
-      const marks = document.querySelectorAll(".mark");
-      let total = 0;
-      let count = 0;
+        const marks = document.querySelectorAll(".mark");
+        const credits = document.querySelectorAll(".credit");
 
-      marks.forEach(m => {
-        const val = parseFloat(m.value);
-        if (!isNaN(val)) {
-          total += val;
-          count++;
+        let totalCredit = 0;
+        let weightedSum = 0;
+
+        for (let i = 0; i < marks.length; i++) {
+          const mark = parseFloat(marks[i].value);
+          const credit = parseFloat(credits[i].value);
+
+          if (!isNaN(mark) && !isNaN(credit)) {
+
+            // Convert marks to grade point (example: 83 → 8.3)
+            const gradePoint = mark / 10;
+
+            weightedSum += gradePoint * credit;
+            totalCredit += credit;
+          }
         }
-      });
 
-      if (count === 0) return;
+        if (totalCredit === 0) return;
 
-      const average = total / count;
-      const cgpa = (average / 10).toFixed(2);
+        const cgpa = (weightedSum / totalCredit).toFixed(2);
 
-      document.getElementById("cgpaResult").innerText =
-        `Average Marks: ${average.toFixed(2)} | CGPA: ${cgpa}`;
+        document.getElementById("cgpaResult").innerText =
+          `CGPA (Credit Based): ${cgpa}`;
 
-      showMotivationQuote(parseFloat(cgpa));
-    }
+        showMotivationQuote(parseFloat(cgpa));
+      }
+
 
     function showMotivationQuote(cgpa) {
       let quote = "";
@@ -315,18 +338,50 @@
     }
 
     /* TODO LIST */
-    function addTodo() {
-      const input = document.getElementById("todoInput");
-      if (input.value === "") return;
+       function addTodo() {
+  const taskInput = document.getElementById("todoInput");
+  const dateInput = document.getElementById("todoDate");
 
-      const li = document.createElement("li");
-     li.innerHTML = `
-        <span>${input.value}</span>
-        <button onclick="this.parentElement.remove()">X</button>
-        `;
-      document.getElementById("todoList").appendChild(li);
-      input.value = "";
-    }
+  const taskText = taskInput.value.trim();
+  const taskDate = dateInput.value;
+
+  if (taskText === "" || taskDate === "") {
+    alert("Please enter task and select date");
+    return;
+  }
+
+  // Convert date to Day Month Year format
+  const dateObj = new Date(taskDate);
+  const formattedDate = dateObj.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+
+  const li = document.createElement("li");
+
+ li.innerHTML = `
+  <div class="task-content">
+    <strong class="task-title">${taskText}</strong><br>
+    <small class="task-date">Due: ${formattedDate}</small>
+  </div>
+  <div class="task-actions">
+    <button onclick="markComplete(this)">✓</button>
+    <button onclick="this.parentElement.parentElement.remove()">X</button>
+  </div>
+`;
+
+  document.getElementById("todoList").appendChild(li);
+
+  taskInput.value = "";
+  dateInput.value = "";
+}
+
+   function markComplete(button) {
+  const taskItem = button.parentElement.parentElement;
+  const taskContent = taskItem.querySelector(".task-content");
+  taskContent.classList.toggle("completed");
+}
 
     /* INIT */
     addMarkInput();
